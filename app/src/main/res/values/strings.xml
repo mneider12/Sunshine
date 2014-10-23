@@ -22,4 +22,6 @@
     <!-- Strings related to show map menu option -->
     <string name="action_map" translatable="false">Show Map</string>
 
+    <string name="action_share">Share</string>
+
 </resources>
