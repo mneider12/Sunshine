@@ -25,7 +25,7 @@ public class TestProvider extends AndroidTestCase {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
     }
 
-    public void testInsertReadDb() {
+    public void testInsertReadProvider() {
 
         WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -65,11 +65,35 @@ public class TestProvider extends AndroidTestCase {
         assertTrue(weatherRowId != -1);
         Log.d(LOG_TAG, "New row id: " + weatherRowId);
 
-        Cursor weatherCursor = db.query(
-                WeatherEntry.TABLE_NAME,
-                null, null, null, null, null,null);
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
 
         validateCursor(weatherCursor, weatherValues);
+
+        cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        validateCursor(cursor, testValues);
+
+        cursor = mContext.getContentResolver().query(
+                LocationEntry.buildLocationUri(locationRowId),
+                null,
+                null,
+                null,
+                null
+        );
+
+        validateCursor(cursor, testValues);
 
         dbHelper.close();
     }
