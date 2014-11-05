@@ -1,13 +1,16 @@
 package com.example.mark.helloworld.app.test;
 
+import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.example.mark.helloworld.app.data.WeatherContract.WeatherEntry;
 import com.example.mark.helloworld.app.data.WeatherContract.LocationEntry;
+import com.example.mark.helloworld.app.data.WeatherContract.WeatherEntry;
 import com.example.mark.helloworld.app.data.WeatherDbHelper;
 
 import java.util.Map;
@@ -27,13 +30,12 @@ public class TestProvider extends AndroidTestCase {
 
     public void testInsertReadProvider() {
 
-        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ContentValues testValues = createNorthPoleLocationValues();
 
-        long locationRowId;
-        locationRowId = db.insert(LocationEntry.TABLE_NAME, null, testValues);
+        Uri locationUri = mContext.getContentResolver().
+                insert(LocationEntry.CONTENT_URI, testValues);
+
+        long locationRowId = ContentUris.parseId(locationUri);
 
         //verify we got a row back
         assertTrue(locationRowId != -1);
@@ -44,13 +46,11 @@ public class TestProvider extends AndroidTestCase {
 
 
         // A cursor is your primary interface to the query results.
-        Cursor cursor = db.query(
-                LocationEntry.TABLE_NAME,   // Table to query
-                null,
+        Cursor cursor = mContext.getContentResolver().query(
+                locationUri,
                 null, // Columns for the "where" clause
                 null, // Values for the "where" clause
                 null, // columns to group by
-                null, // columns to filter by row groups
                 null  // sort order
         );
 
@@ -58,12 +58,11 @@ public class TestProvider extends AndroidTestCase {
 
         ContentValues weatherValues = createWeatherValues(locationRowId);
 
-        long weatherRowId;
-        weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
 
-        //Verify we got a row back.
-        assertTrue(weatherRowId != -1);
-        Log.d(LOG_TAG, "New row id: " + weatherRowId);
+        Uri WeatherInsertUri = mContext.getContentResolver().
+                insert(WeatherEntry.CONTENT_URI, weatherValues);
+        long weatherRowId = ContentUris.parseId(WeatherInsertUri);
+        assertTrue(WeatherInsertUri != null);
 
         Cursor weatherCursor = mContext.getContentResolver().query(
                 WeatherEntry.CONTENT_URI,
@@ -95,7 +94,28 @@ public class TestProvider extends AndroidTestCase {
 
         validateCursor(cursor, testValues);
 
-        dbHelper.close();
+        addAllContentValues(weatherValues,testValues);
+
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocation(TestDb.TEST_LOCATION),
+                null,
+                null,
+                null,
+                null
+        );
+        TestDb.validateCursor(weatherCursor, weatherValues);
+
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocationWithStartDate(TestDb.TEST_LOCATION,
+                        TestDb.TEST_DATE),
+                null,
+                null,
+                null,
+                null
+        );
+        TestDb.validateCursor(weatherCursor, weatherValues);
+
+        weatherCursor.close();
     }
 
     static ContentValues createWeatherValues(long locationRowId) {
@@ -188,4 +208,15 @@ public class TestProvider extends AndroidTestCase {
         // vnd.android.cursor.item/com.example.android.sunshine.app/location
         assertEquals(LocationEntry.CONTENT_ITEM_TYPE, type);
     }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    void addAllContentValues(ContentValues destination, ContentValues source) {
+        for (String key : source.keySet()) {
+            destination.put(key, source.getAsString(key));
+        }
+    }
+
+
+
+
 }

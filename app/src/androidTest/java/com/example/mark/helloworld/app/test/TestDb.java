@@ -78,39 +78,44 @@ public class TestDb extends AndroidTestCase {
         dbHelper.close();
     }
 
+    protected static final String TEST_DATE = "20141205";
+    protected static final double TEST_DEGREES = 1.1;
+    protected static final double TEST_HUMIDITY = 1.2;
+    protected static final double TEST_PRESSURE = 1.3;
+    protected static final int TEST_MAX = 75;
+    protected static final int TEST_MIN = 65;
+    protected static final String TEST_DESC = "Asteroids";
+    protected static final double TEST_WIND = 5.5;
+    protected static final int TEST_ID = 321;
     static ContentValues createWeatherValues(long locationRowId) {
-        String testDate = "20141205";
-        double testDegrees = 1.1;
-        double testHumidity = 1.2;
-        double testPressure = 1.3;
-        int testMax = 75;
-        int testMin = 65;
-        String testDesc = "Asteroids";
-        double testWind = 5.5;
-        int testId = 321;
 
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationRowId);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATETEXT, testDate);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, testDegrees);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, testHumidity);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, testPressure);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, testMax);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, testMin);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, testDesc);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, testWind);
-        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, testId);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATETEXT, TEST_DATE);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, TEST_DEGREES);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, TEST_HUMIDITY);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, TEST_PRESSURE);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, TEST_MAX);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, TEST_MIN);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, TEST_DESC);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, TEST_WIND);
+        weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, TEST_ID);
 
         return weatherValues;
     }
 
+    protected static final String TEST_NAME = "North Pole";
+    protected static final String TEST_LOCATION = "99705";
+    protected static final double TEST_LATITUDE = 64.772;
+    protected static final double TEST_LONGITUDE = -147.355;
+
     static ContentValues createNorthPoleLocationValues() {
 
         // Test data we're going to insert into the DB to
-        String testName = "North Pole";
-        String testLocationSetting = "99705";
-        double testLatitude = 64.772;
-        double testLongitude = -147.355;
+        String testName = TEST_NAME;
+        String testLocationSetting = TEST_LOCATION;
+        double testLatitude = TEST_LATITUDE;
+        double testLongitude = TEST_LONGITUDE;
 
         //Create a new map of values, where column names are the keys
         ContentValues testValues = new ContentValues();
