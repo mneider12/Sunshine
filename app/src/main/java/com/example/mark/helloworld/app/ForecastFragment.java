@@ -5,8 +5,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,12 +19,46 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.mark.helloworld.app.data.WeatherContract;
+import com.example.mark.helloworld.app.data.WeatherContract.LocationEntry;
+import com.example.mark.helloworld.app.data.WeatherContract.WeatherEntry;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int FORECAST_LOADER = 0;
+    private String mLocation;
+
+    // For the forecast view we're showing only a small subset of the stored data.
+    // Specify the columns we need.
+    private static final String[] FORECAST_COLUMNS = {
+            // In this case the id needs to be fully qualified with a table name, since
+            // the content provider joins the location & weather tables in the background
+            // (both have an _id column)
+            // On the one hand, that's annoying.  On the other, you can search the weather table
+            // using the location set by the user, which is only in the Location table.
+            // So the convenience is worth it.
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            LocationEntry.COLUMN_LOCATION_SETTING
+    };
+
+    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+    // must change.
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE = 1;
+    public static final int COL_WEATHER_DESC = 2;
+    public static final int COL_WEATHER_MAX_TEMP = 3;
+    public static final int COL_WEATHER_MIN_TEMP = 4;
+    public static final int COL_LOCATION_SETTING = 5;
 
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
@@ -109,9 +145,26 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
+
+
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return null;
+        String startDate = WeatherContract.getDbDateString(new Date());
+
+        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+
+        mLocation = Utility.getPreferredLocation(getActivity());
+        Uri weatherForLocationUti = WeatherEntry.buildWeatherLocationWithStartDate(
+                mLocation, startDate);
+
+        return new CursorLoader(
+                getActivity(),
+                weatherForLocationUti,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     @Override
@@ -122,5 +175,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(android.support.v4.content.Loader<Cursor> cursorLoader) {
 
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 }
