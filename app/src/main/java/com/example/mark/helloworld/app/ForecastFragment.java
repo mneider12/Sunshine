@@ -1,10 +1,12 @@
 package com.example.mark.helloworld.app;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
@@ -107,4 +109,18 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public android.support.v4.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(android.support.v4.content.Loader<Cursor> cursorLoader, Cursor cursor) {
+
+    }
+
+    @Override
+    public void onLoaderReset(android.support.v4.content.Loader<Cursor> cursorLoader) {
+
+    }
 }
